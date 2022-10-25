@@ -95,10 +95,12 @@ public class Dungeon {
         currentBox.fight.fight();
         commandMenu();
     }
-    static void delete(Box currentBox) {
-        currentBox.data = null;
-        commandMenu();
-    }
+
+    // static void delete(Box currentBox) {
+    //     currentBox.data = null;
+    //     commandMenu();
+    // }
+
     // moves the current box to .next
     private static void moveUp(Box currentBox) {
         currentBox.current = false;
