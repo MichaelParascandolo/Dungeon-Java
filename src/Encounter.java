@@ -1,18 +1,27 @@
-public class Encounter  {
-    static Player player1 = new Player();
-    Enemy enemy1 = new Enemy();
-    // encounter can be enemy, item, 
+import java.util.Random;
 
-    public void fight() {
+public class Encounter  {
+    private Player player1 = new Player();
+    private Enemy enemy1 = new Enemy();
+    private Random ran = new Random();
+    // make atk and def random?
+    public boolean attack() {
+        enemy1.setDef(ran.nextInt(101));
+        System.out.println(enemy1.getDef());
     if(player1.getAtk() > enemy1.getDef()) {
-        // System.out.println("Player Won");
         System.out.println("20XP Earned!");
-        // System.out.println("Plater XP Before: " + player1.getXP());
         player1.setXP(20);
         System.out.println("Player XP: " + player1.getXP());
+        return true;
     }
     else { 
-        System.out.println("Player Lost");
+        player1.setHealth(-20);
+        System.out.println("Player Health: " + player1.getHealth());
+        return false;
     }
     }
+    public Player getPlayer() {
+        return player1;
+    }
+
 }

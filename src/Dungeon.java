@@ -1,64 +1,67 @@
 import java.util.Scanner;
-
+// DO NOT USE STATIC!
+// PUBLIC VARIABLES MUST ALL BE PRIVATE
 public class Dungeon {
-    private static int levels;
-    private static Box [] boxes;
-    private static int numOfLevels;
-    private static int startingBox;
-    private static Box theCurrentBox;
+    private int levels;
+    private Box [] boxes;
+    private int numOfLevels;
+    private int startingBox;
+    private Box theCurrentBox;
 
-    public static void DungeonHelper(int N) {
+     public void DungeonHelper(int N) {
         numOfLevels = N;
         boxes = new Box[N];
         
         // Creates N number of boxes
         for(int i = 0; i < N; i++) {
             boxes[i] = new Box("["+i+"]");
-            // System.out.println(boxes[i].data);
+            // System.out.println(boxes[i].getData());
         }
         // sets the last box.next = first box
-        boxes[N-1].next = boxes[0];
+        // boxes[N-1].next = boxes[0];
+        boxes[N-1].setNext(boxes[0]);
         // sets all next boxes
         for(int j = 0; j < N; j++) {
-            if(!boxes[j].hasNext()) {
-                boxes[j].next = boxes[j+1];
+            if(boxes[j].getNext() == null) {
+                boxes[j].setNext(boxes[j+1]);
             }
-           
-            // System.out.println(boxes[j].next.data);
+            // System.out.println(boxes[j].getNext().getData());
         }
         // sets the first box.next = last box
-        boxes[0].previous = boxes[N-1];
+        boxes[0].setPrevious(boxes[N-1]);
         // sets all previous boxes
+        //
         for(int k = 0; k < N; k++) {
-            if(!boxes[k].hasPrevious()) {
-                boxes[k].previous = boxes[k-1];
+            if(boxes[k].getPrevious() == null) {
+                boxes[k].setPrevious(boxes[k-1]);;
             }
-            // System.out.println(boxes[k].previous.data);
+            // System.out.println(boxes[k].getPrevious().getData());
         }
-        
          startGame();
         
     }
-    public static void startGame() {
+    private void startGame() {
+        // starts the game by starting the player in the middle
         startingBox = (int) Math.floor(numOfLevels/2);
         theCurrentBox = boxes[startingBox];
-        theCurrentBox.current = true;
-        theCurrentBox.dataHolder = theCurrentBox.data;
-        theCurrentBox.data = "[X]";
+        // theCurrentBox.current = true;
+        theCurrentBox.setCurrent(true);
+        theCurrentBox.setDataHolder(theCurrentBox.getData());
+        theCurrentBox.setData("" + theCurrentBox.getData() + " You Are Here");
         commandMenu();
         
     }
-    public static void commandMenu() {
+    private void commandMenu() {
                 System.out.println();
-                System.out.println("Enter A Command:");
-                System.out.println("PRINT | UP | DOWN | ATTACK | RUN | QUIT");
+                System.out.println("Enter Command:");
+                System.out.println("PRINT | UP | DOWN | ATTACK |  QUIT");
             
                 try (Scanner myObj = new Scanner(System.in)) {
                     String command = myObj.nextLine();
          
                     if(command.equalsIgnoreCase("PRINT")) {
                         // just just prints current for now
-                        printDungeon("current");
+                        printDungeon();
                     }
                     else if(command.equalsIgnoreCase("up")) {
                         moveUp(theCurrentBox);
@@ -69,14 +72,11 @@ public class Dungeon {
                     else if(command.equalsIgnoreCase("attack")) {
                         attack(theCurrentBox);
                     } 
-                    else if(command.equalsIgnoreCase("run")) {
-                        run(theCurrentBox);
-                    }
+                    // else if(command.equalsIgnoreCase("run")) {
+                    //     run(theCurrentBox);
+                    // }
                     else if(command.equalsIgnoreCase("quit")) {
                         System.exit(0);
-                    }
-                    else if(command.equalsIgnoreCase("test")) {
-                        delete(theCurrentBox);
                     }
                     else {
                         System.out.println("Invalid Input . . .");
@@ -87,58 +87,68 @@ public class Dungeon {
                     //  Block of code to handle errors
                 }
     }
-    private static void run(Box currentBox) {
-        Encounter.player1.setHealth(50);
-        System.out.println(Encounter.player1.getHealth());
+    private void run(Box currentBox) {
+        // player loses health if you run
+        Encounter encounter1 = new Encounter();
+        encounter1.getPlayer().setHealth(50);
+        System.out.println("Health Lost:" + encounter1.getPlayer().getHealth());
     }
-    private static void attack(Box currentBox) {
-        currentBox.fight.fight();
+    private void attack(Box currentBox) {
+        // if player wins, delete the box
+        if(currentBox.getFight().attack()) {
+            delete(currentBox);
+        }
         commandMenu();
     }
 
-    // static void delete(Box currentBox) {
-    //     currentBox.data = null;
-    //     commandMenu();
-    // }
+    // deletes the box if the player wins
+    private void delete(Box currentBox) {
+        currentBox.setData(null);
+        moveUp(currentBox);
+        commandMenu();
+    }
 
     // moves the current box to .next
-    private static void moveUp(Box currentBox) {
-        currentBox.current = false;
-        currentBox.data = currentBox.dataHolder;
-        //
-        currentBox.next.dataHolder = currentBox.next.data;
-        currentBox.next.current = true;
-        currentBox.next.data = "[X]";
+    private void moveUp(Box currentBox) {
+        currentBox.setCurrent(false);
+        if(currentBox.getData() != null) {
+            currentBox.setData(currentBox.getDataHolder());
+        }
+        currentBox.getNext().setDataHolder(currentBox.getNext().getData());
+        currentBox.getNext().setCurrent(true);
+        currentBox.getNext().setData(currentBox.getNext().getData() + " You Are Here");
         
-        theCurrentBox = currentBox.next;
+        theCurrentBox = currentBox.getNext();
+        printDungeon();
         commandMenu();
 
     }
     // COMBINE INTO ONE METHOD????
     // moves the current box to .previous
-    private static void moveDown(Box currentBox) {
-        currentBox.current = false;
-        currentBox.data = currentBox.dataHolder;
+    private void moveDown(Box currentBox) {
+        currentBox.setCurrent(false);
+        if(currentBox.getData() != null) {
+            currentBox.setData(currentBox.getDataHolder());
+        }
         //
-        currentBox.previous.dataHolder = currentBox.previous.data;
-        currentBox.previous.current = true;
-        currentBox.previous.data = "[X]";
+        currentBox.getPrevious().setDataHolder(currentBox.getPrevious().getData());
+        currentBox.getPrevious().setCurrent(true);
+        currentBox.getPrevious().setData(currentBox.getPrevious().getData() + " You Are Here");
         
-        theCurrentBox = currentBox.previous;
+        theCurrentBox = currentBox.getPrevious();
+        printDungeon();
         commandMenu();
     }
-    private static void printDungeon(String printWhat) {
+    private void printDungeon() {
         // prints list normally
-        if(printWhat.equalsIgnoreCase("current")) {
             for(int i = 0; i < numOfLevels; i++) {  
-                if(boxes[i].data != null) {
-                    System.out.println(boxes[i].data);
+                if(boxes[i].getData() != null) {
+                    System.out.println(boxes[i].getData());
                 }
             }
-        }// prints all next 
         commandMenu();
     }
-    private static void startMenu() {
+    private void startMenu() {
         try (Scanner myObj = new Scanner(System.in)) {
             // easy has 5 levels, medium has 10, and hard has 30?
             System.out.println();
@@ -171,15 +181,8 @@ public class Dungeon {
             DungeonHelper(levels);
         }
         catch(Exception e) {
-            //  Block of code to handle errors
+            System.out.println(e);
         }
     }
-    public static void main(String[] args) {
-        // startMenu();
-        DungeonHelper(10);
-        // USED FOR TESTING
-    }
-
-
 
 }
