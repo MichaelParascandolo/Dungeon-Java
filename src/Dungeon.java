@@ -7,7 +7,7 @@ public class Dungeon {
     private Box [] boxes;
     private int numOfLevels;
     private Box theCurrentBox;
-
+//test
      public void DungeonHelper(int numOfLevels) {
         this.numOfLevels = numOfLevels;
         boxes = new Box[numOfLevels];
