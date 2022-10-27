@@ -6,16 +6,17 @@ public class Encounter  {
     private Random ran = new Random();
     // make atk and def random?
     public boolean attack() {
-        enemy1.setDef(ran.nextInt(101));
-        System.out.println(enemy1.getDef());
+        enemy1.setDef(ran.nextInt(151));
+        // System.out.println(enemy1.getDef());
     if(player1.getAtk() > enemy1.getDef()) {
-        System.out.println("20XP Earned!");
+        System.out.println("You Won: 20XP Earned");
         player1.setXP(20);
         System.out.println("Player XP: " + player1.getXP());
         return true;
     }
     else { 
         player1.setHealth(-20);
+        System.out.print("Enemy Won");
         System.out.println("Player Health: " + player1.getHealth());
         return false;
     }

@@ -2,36 +2,36 @@ import java.util.Scanner;
 // DO NOT USE STATIC!
 // PUBLIC VARIABLES MUST ALL BE PRIVATE
 public class Dungeon {
-    private int levels;
+    // private int levels;
+    // private int startingBox;
     private Box [] boxes;
     private int numOfLevels;
-    private int startingBox;
     private Box theCurrentBox;
 
-     public void DungeonHelper(int N) {
-        numOfLevels = N;
-        boxes = new Box[N];
+     public void DungeonHelper(int numOfLevels) {
+        this.numOfLevels = numOfLevels;
+        boxes = new Box[numOfLevels];
         
         // Creates N number of boxes
-        for(int i = 0; i < N; i++) {
+        for(int i = 0; i < numOfLevels; i++) {
             boxes[i] = new Box("["+i+"]");
             // System.out.println(boxes[i].getData());
         }
         // sets the last box.next = first box
         // boxes[N-1].next = boxes[0];
-        boxes[N-1].setNext(boxes[0]);
+        boxes[numOfLevels-1].setNext(boxes[0]);
         // sets all next boxes
-        for(int j = 0; j < N; j++) {
+        for(int j = 0; j < numOfLevels; j++) {
             if(boxes[j].getNext() == null) {
                 boxes[j].setNext(boxes[j+1]);
             }
             // System.out.println(boxes[j].getNext().getData());
         }
         // sets the first box.next = last box
-        boxes[0].setPrevious(boxes[N-1]);
+        boxes[0].setPrevious(boxes[numOfLevels-1]);
         // sets all previous boxes
         //
-        for(int k = 0; k < N; k++) {
+        for(int k = 0; k < numOfLevels; k++) {
             if(boxes[k].getPrevious() == null) {
                 boxes[k].setPrevious(boxes[k-1]);;
             }
@@ -42,14 +42,11 @@ public class Dungeon {
     }
     private void startGame() {
         // starts the game by starting the player in the middle
-        startingBox = (int) Math.floor(numOfLevels/2);
-        theCurrentBox = boxes[startingBox];
-        // theCurrentBox.current = true;
+        theCurrentBox = boxes[(int) Math.floor(numOfLevels/2)];
         theCurrentBox.setCurrent(true);
         theCurrentBox.setDataHolder(theCurrentBox.getData());
         theCurrentBox.setData("" + theCurrentBox.getData() + " You Are Here");
-        commandMenu();
-        
+        commandMenu();   
     }
     private void commandMenu() {
                 System.out.println();
@@ -72,9 +69,9 @@ public class Dungeon {
                     else if(command.equalsIgnoreCase("attack")) {
                         attack(theCurrentBox);
                     } 
-                    // else if(command.equalsIgnoreCase("run")) {
-                    //     run(theCurrentBox);
-                    // }
+                    else if(command.equalsIgnoreCase("run")) {
+                        run();
+                    }
                     else if(command.equalsIgnoreCase("quit")) {
                         System.exit(0);
                     }
@@ -84,10 +81,10 @@ public class Dungeon {
                     }
                 }
                 catch(Exception e) {
-                    //  Block of code to handle errors
+                    System.out.println(e);
                 }
     }
-    private void run(Box currentBox) {
+    private void run() {
         // player loses health if you run
         Encounter encounter1 = new Encounter();
         encounter1.getPlayer().setHealth(50);
@@ -117,11 +114,9 @@ public class Dungeon {
         currentBox.getNext().setDataHolder(currentBox.getNext().getData());
         currentBox.getNext().setCurrent(true);
         currentBox.getNext().setData(currentBox.getNext().getData() + " You Are Here");
-        
         theCurrentBox = currentBox.getNext();
         printDungeon();
         commandMenu();
-
     }
     // COMBINE INTO ONE METHOD????
     // moves the current box to .previous
@@ -148,9 +143,9 @@ public class Dungeon {
             }
         commandMenu();
     }
-    private void startMenu() {
+    void startMenu() {
         try (Scanner myObj = new Scanner(System.in)) {
-            // easy has 5 levels, medium has 10, and hard has 30?
+            // easy has 5 levels, medium has 15, and hard has 30
             System.out.println();
             System.out.println("Select Difficulty:");
             System.out.println("EASY | MEDIUM | HARD | CUSTOM");
@@ -159,17 +154,17 @@ public class Dungeon {
             System.out.println();
             
             if(difficulty.equalsIgnoreCase("easy")) {
-                levels = 5;
+                numOfLevels = 5;
             }
             else if(difficulty.equalsIgnoreCase("medium")) {
-                levels = 15;
+                numOfLevels = 15;
             }
             else if(difficulty.equalsIgnoreCase("hard")) {
-                levels = 30;
+                numOfLevels = 30;
             }
             else if(difficulty.equalsIgnoreCase("custom")) {
                 System.out.println("Enter Desired Number Of Levels: ");
-                levels = myObj.nextInt();
+                numOfLevels = myObj.nextInt();
             }
             else {
                 // if input is invalid just restart the program
@@ -178,7 +173,7 @@ public class Dungeon {
                 
             }
             System.out.println("Difficulty Chosen: " + difficulty.toUpperCase() + " ");
-            DungeonHelper(levels);
+            DungeonHelper(numOfLevels);
         }
         catch(Exception e) {
             System.out.println(e);
