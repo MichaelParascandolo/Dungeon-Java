@@ -11,6 +11,7 @@ public class Dungeon {
         this.boxes = new Box[numOfLevels];
         this.player = new Player();
         
+        // THIS COULD DEFINITELY BE COMBINED INTO 1 OR 2 LOOPS . . ..
         // Creates N number of boxes
         for(int i = 0; i < numOfLevels; i++) {
             boxes[i] = new Box("["+i+"]");
@@ -28,7 +29,6 @@ public class Dungeon {
         // sets the first box.next = last box
         boxes[0].setPrevious(boxes[numOfLevels-1]);
         // sets all previous boxes
-        
         for(int k = 0; k < numOfLevels; k++) {
             if(boxes[k].getPrevious() == null) {
                 boxes[k].setPrevious(boxes[k-1]);;
@@ -145,7 +145,7 @@ public class Dungeon {
     // deletes the box if the player wins
     private void delete(Box currentBox) {
         currentBox.setData(null);
-        currentBox.setDeleted(true);
+        currentBox.setIsDeleted(true);
         // if the player wins move them up to the next box
         move(currentBox,true);
         commandMenu();
@@ -155,28 +155,39 @@ public class Dungeon {
         if(win) {
             System.out.println("\nYOU HAVE COMPLETED THE DUNGEON!\n");
         }        
-        else {
+        else if(!win) {
             System.out.println("\nGAME OVER!");
         }
         System.exit(0);
     }
     // when the player wants to move
     private void move(Box currentBox, Boolean up) {
-        // currentBox.setCurrent(false);
-        if(currentBox.getData() != null) {
+        if(!currentBox.getIsDeleted()) {
+            // puts box back to default data if not deleted
             currentBox.setData(currentBox.getDataHolder());
         }
-        // if the player wants to move up
         if(up) {
-            currentBox.getNext().setDataHolder(currentBox.getNext().getData());
             newCurrentBox = currentBox.getNext();
-            currentBox.getNext().setData(currentBox.getNext().getData() + " You Are Here");
+            // if current box, next box, and previous box are all deleted the game must be over
+            if(newCurrentBox.getIsDeleted() && newCurrentBox.getNext().getIsDeleted() && newCurrentBox.getPrevious().getIsDeleted()) {
+                endGame(true);
+            }
+            // if next box is deleted skip the box
+            if(newCurrentBox.getIsDeleted()) {
+                newCurrentBox = newCurrentBox.getNext();
+            }
+            newCurrentBox.setDataHolder(newCurrentBox.getData());
+            newCurrentBox.setData(newCurrentBox.getData() + " You Are Here");
         }
         // if the player wants to move down
         else if(!up) {
-            currentBox.getPrevious().setDataHolder(currentBox.getPrevious().getData());
             newCurrentBox = currentBox.getPrevious();
-            currentBox.getPrevious().setData(currentBox.getPrevious().getData() + " You Are Here");
+            // if previous box is deleted skip the box
+            if(newCurrentBox.getIsDeleted()) {
+                newCurrentBox = newCurrentBox.getPrevious();
+            }
+            newCurrentBox.setDataHolder(newCurrentBox.getData());
+            newCurrentBox.setData(newCurrentBox.getData() + " You Are Here");
         }
         printDungeon(false);
         commandMenu();
@@ -184,7 +195,7 @@ public class Dungeon {
     // displays dungeon 
     private void printDungeon(boolean cheat) {
             for(int i = 0; i < numOfLevels; i++) {  
-                if(boxes[i].getData() != null) {
+                if(!boxes[i].getIsDeleted()) {
                     System.out.println("\n" + boxes[i].getData());
                     if(cheat) {
                         System.out.println("Enemy Attack:" + boxes[i].getEncounter().getEnemy().getAtk());

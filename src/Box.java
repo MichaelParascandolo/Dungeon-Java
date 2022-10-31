@@ -4,14 +4,14 @@ public class Box {
     private String dataHolder;
     private Box next;
     private Box previous;
-    private Boolean deleted;
+    private Boolean isDeleted;
     private Encounter encounter = new Encounter();
 
     public Box(String data) {
         this.data = data;
         this.next = null;
         this.previous = null;
-        this.deleted = false;
+        this.isDeleted = false;
     }
     // GETTERS
     public String getData() {
@@ -26,8 +26,8 @@ public class Box {
     public Box getPrevious() {
         return previous;
     }
-    public boolean getDeleted() {
-        return deleted;
+    public boolean getIsDeleted() {
+        return isDeleted;
     }
     public Encounter getEncounter() {
         return encounter;
@@ -46,7 +46,7 @@ public class Box {
     public void setPrevious(Box previous) {
         this.previous = previous;
     }
-    public void setDeleted(Boolean deleted) {
-        this.deleted = deleted;
+    public void setIsDeleted(Boolean isDeleted) {
+        this.isDeleted = isDeleted;
     }
 }

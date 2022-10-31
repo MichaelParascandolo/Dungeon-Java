@@ -6,7 +6,7 @@ public class Encounter {
     private Item item;
     
     public Encounter() {
-        this.enemy = new Enemy(ran.nextInt(100),ran.nextInt(100030));
+        this.enemy = new Enemy(ran.nextInt(100),ran.nextInt(150));
     }
     public boolean rollItem() {
         // health potion
