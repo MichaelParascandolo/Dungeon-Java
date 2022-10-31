@@ -1,24 +1,22 @@
 import java.util.Scanner;
-// DO NOT USE STATIC!
-// PUBLIC VARIABLES MUST ALL BE PRIVATE
+
 public class Dungeon {
-    // private int levels;
-    // private int startingBox;
     private Box [] boxes;
     private int numOfLevels;
-    private Box theCurrentBox;
-//test
+    private Box newCurrentBox;
+    private Player player;
+
      public void DungeonHelper(int numOfLevels) {
         this.numOfLevels = numOfLevels;
-        boxes = new Box[numOfLevels];
+        this.boxes = new Box[numOfLevels];
+        this.player = new Player();
         
         // Creates N number of boxes
         for(int i = 0; i < numOfLevels; i++) {
             boxes[i] = new Box("["+i+"]");
-            // System.out.println(boxes[i].getData());
+            // System.out.println("\n"+ boxes[i].getData());
         }
         // sets the last box.next = first box
-        // boxes[N-1].next = boxes[0];
         boxes[numOfLevels-1].setNext(boxes[0]);
         // sets all next boxes
         for(int j = 0; j < numOfLevels; j++) {
@@ -30,7 +28,7 @@ public class Dungeon {
         // sets the first box.next = last box
         boxes[0].setPrevious(boxes[numOfLevels-1]);
         // sets all previous boxes
-        //
+        
         for(int k = 0; k < numOfLevels; k++) {
             if(boxes[k].getPrevious() == null) {
                 boxes[k].setPrevious(boxes[k-1]);;
@@ -40,41 +38,54 @@ public class Dungeon {
          startGame();
         
     }
+    // GETS player
+    public Player getPlayer() {
+        return player;
+    }
+    // GETS currentBox
+    public Box getTheCurrentBox() {
+        return newCurrentBox;
+    }
+    // starts the game by starting the player in the middle
     private void startGame() {
-        // starts the game by starting the player in the middle
-        theCurrentBox = boxes[(int) Math.floor(numOfLevels/2)];
-        theCurrentBox.setCurrent(true);
-        theCurrentBox.setDataHolder(theCurrentBox.getData());
-        theCurrentBox.setData("" + theCurrentBox.getData() + " You Are Here");
+        newCurrentBox = boxes[(int) Math.floor(numOfLevels/2)];
+        // newCurrentBox.setCurrent(true);
+        newCurrentBox.setDataHolder(newCurrentBox.getData());
+        newCurrentBox.setData(newCurrentBox.getData() + " You Are Here");
         commandMenu();   
     }
+    // what does the player want to do next
     private void commandMenu() {
-                System.out.println();
-                System.out.println("Enter Command:");
-                System.out.println("PRINT | UP | DOWN | ATTACK |  QUIT");
+                System.out.println("\nEnter Command:");
+                System.out.println("PRINT | UP | DOWN | ATTACK | RUN | QUIT");
             
                 try (Scanner myObj = new Scanner(System.in)) {
                     String command = myObj.nextLine();
          
                     if(command.equalsIgnoreCase("PRINT")) {
-                        // just just prints current for now
-                        printDungeon();
+                        printDungeon(false);
                     }
                     else if(command.equalsIgnoreCase("up")) {
-                        moveUp(theCurrentBox);
+                        move(newCurrentBox,true);
                     }
                     else if(command.equalsIgnoreCase("down")) {
-                        moveDown(theCurrentBox);
+                        move(newCurrentBox,false);
                     }
                     else if(command.equalsIgnoreCase("attack")) {
-                        attack(theCurrentBox);
+                        attack(newCurrentBox);
                     } 
                     else if(command.equalsIgnoreCase("run")) {
-                        run();
+                        run(newCurrentBox);
+                    }
+                    else if(command.equals("cheat")) {
+                        printDungeon(true);
                     }
                     else if(command.equalsIgnoreCase("quit")) {
                         System.exit(0);
                     }
+                    // else if(command.equals("use item")) {
+                    
+                    // }
                     else {
                         System.out.println("Invalid Input . . .");
                         commandMenu();
@@ -84,74 +95,113 @@ public class Dungeon {
                     System.out.println(e);
                 }
     }
-    private void run() {
-        // player loses health if you run
-        Encounter encounter1 = new Encounter();
-        encounter1.getPlayer().setHealth(50);
-        System.out.println("Health Lost:" + encounter1.getPlayer().getHealth());
+    // player is able to RUN (skip/delete) current box but loses health
+    private void run(Box currentBox) {
+        player.setHealth(-30);
+        if(player.getHealth() <= 0) {
+            endGame(false);
+        }
+        System.out.println("\nHealth Remaining: " + player.getHealth());
+        delete(currentBox);
     }
+    // if player wins, delete the box
     private void attack(Box currentBox) {
-        // if player wins, delete the box
-        if(currentBox.getFight().attack()) {
+        if(player.getAtk() >= currentBox.getEncounter().getEnemy().getDef()) {
+            System.out.println("\nPLAYER BEATS ENEMY");
+            // rolls a random number to see if the player gets an item
+            if(currentBox.getEncounter().rollItem()) {
+                String itemName = currentBox.getEncounter().getItem().getName();
+                System.out.println("\nYou Picked Up A " + itemName + "!");
+                useItem(itemName,currentBox);
+            }
             delete(currentBox);
+        }
+        else {
+            System.out.println("\nENEMY BEATS PLAYER");
+            // player loses health equal to enemy's attack
+            player.setHealth( - currentBox.getEncounter().getEnemy().getAtk());
+            // if player loses to enemy, enemy loses def - player attack
+            currentBox.getEncounter().getEnemy().setDef(- player.getAtk());
+            if(player.getHealth() <= 0) {
+                endGame(false);
+            }
+            System.out.print("\nHealth Remaining: " + player.getHealth());
         }
         commandMenu();
     }
-
+    // uses item
+    public void useItem(String itemName, Box currentBox) {
+        if(itemName.equals("Health Potion")) {
+            player.setHealth(currentBox.getEncounter().getItem().getStatBoost());
+            System.out.println(currentBox.getEncounter().getItem().getDescription());
+            System.out.println("Player Health: " + player.getHealth());
+        }
+        else {
+            player.setAtk(currentBox.getEncounter().getItem().getStatBoost());
+            System.out.println(currentBox.getEncounter().getItem().getDescription());
+            System.out.println("Player Attack: " + player.getAtk());
+        }
+    }
     // deletes the box if the player wins
     private void delete(Box currentBox) {
         currentBox.setData(null);
-        moveUp(currentBox);
+        currentBox.setDeleted(true);
+        // if the player wins move them up to the next box
+        move(currentBox,true);
         commandMenu();
     }
-
-    // moves the current box to .next
-    private void moveUp(Box currentBox) {
-        currentBox.setCurrent(false);
+    // if the player wins/loses
+    private void endGame(boolean win) {
+        if(win) {
+            System.out.println("\nYOU HAVE COMPLETED THE DUNGEON!\n");
+        }        
+        else {
+            System.out.println("\nGAME OVER!");
+        }
+        System.exit(0);
+    }
+    // when the player wants to move
+    private void move(Box currentBox, Boolean up) {
+        // currentBox.setCurrent(false);
         if(currentBox.getData() != null) {
             currentBox.setData(currentBox.getDataHolder());
         }
-        currentBox.getNext().setDataHolder(currentBox.getNext().getData());
-        currentBox.getNext().setCurrent(true);
-        currentBox.getNext().setData(currentBox.getNext().getData() + " You Are Here");
-        theCurrentBox = currentBox.getNext();
-        printDungeon();
-        commandMenu();
-    }
-    // COMBINE INTO ONE METHOD????
-    // moves the current box to .previous
-    private void moveDown(Box currentBox) {
-        currentBox.setCurrent(false);
-        if(currentBox.getData() != null) {
-            currentBox.setData(currentBox.getDataHolder());
+        // if the player wants to move up
+        if(up) {
+            currentBox.getNext().setDataHolder(currentBox.getNext().getData());
+            newCurrentBox = currentBox.getNext();
+            currentBox.getNext().setData(currentBox.getNext().getData() + " You Are Here");
         }
-        //
-        currentBox.getPrevious().setDataHolder(currentBox.getPrevious().getData());
-        currentBox.getPrevious().setCurrent(true);
-        currentBox.getPrevious().setData(currentBox.getPrevious().getData() + " You Are Here");
-        
-        theCurrentBox = currentBox.getPrevious();
-        printDungeon();
+        // if the player wants to move down
+        else if(!up) {
+            currentBox.getPrevious().setDataHolder(currentBox.getPrevious().getData());
+            newCurrentBox = currentBox.getPrevious();
+            currentBox.getPrevious().setData(currentBox.getPrevious().getData() + " You Are Here");
+        }
+        printDungeon(false);
         commandMenu();
     }
-    private void printDungeon() {
-        // prints list normally
+    // displays dungeon 
+    private void printDungeon(boolean cheat) {
             for(int i = 0; i < numOfLevels; i++) {  
                 if(boxes[i].getData() != null) {
-                    System.out.println(boxes[i].getData());
+                    System.out.println("\n" + boxes[i].getData());
+                    if(cheat) {
+                        System.out.println("Enemy Attack:" + boxes[i].getEncounter().getEnemy().getAtk());
+                        System.out.println("Enemy Defense:" + boxes[i].getEncounter().getEnemy().getDef());
+                    }
                 }
             }
         commandMenu();
     }
-    void startMenu() {
+    // starts the game by player picking difficulty
+    public void startMenu() {
         try (Scanner myObj = new Scanner(System.in)) {
             // easy has 5 levels, medium has 15, and hard has 30
-            System.out.println();
-            System.out.println("Select Difficulty:");
-            System.out.println("EASY | MEDIUM | HARD | CUSTOM");
+            System.out.println("\nSelect Difficulty:");
+            System.out.println("EASY | MEDIUM | HARD | CUSTOM\n");
             
             String difficulty = myObj.nextLine();
-            System.out.println();
             
             if(difficulty.equalsIgnoreCase("easy")) {
                 numOfLevels = 5;
@@ -165,15 +215,20 @@ public class Dungeon {
             else if(difficulty.equalsIgnoreCase("custom")) {
                 System.out.println("Enter Desired Number Of Levels: ");
                 numOfLevels = myObj.nextInt();
+                if(numOfLevels <= 0 ) {
+                    System.out.println("Cannot Have " + numOfLevels + " Levels!");
+                    startMenu();
+                }
             }
             else {
-                // if input is invalid just restart the program
+                // if input is invalid just restart menu
                 System.out.println("Invalid Input . . .");
                 startMenu();
                 
             }
             System.out.println("Difficulty Chosen: " + difficulty.toUpperCase() + " ");
             DungeonHelper(numOfLevels);
+
         }
         catch(Exception e) {
             System.out.println(e);

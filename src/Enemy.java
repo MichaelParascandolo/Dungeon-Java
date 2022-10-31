@@ -1,10 +1,19 @@
 public class Enemy {
-    private int Atk = 45;
-    private int Speed = 65;
-    private int Def = 0;
-    private int Life = 90;
-    private int ExpValue = 50;
-    
+    private int Atk;
+    private int Speed;
+    private int Def;
+    private int Life;
+    private int ExpValue;
+
+    // default enemy
+    public Enemy(int attack, int defense) {
+        this.Atk = attack;
+        this.Speed = 65;
+        this.Def = defense;
+        this.Life = 90;
+        this.ExpValue = 50;
+    }
+
     // GETTERS
     public int getAtk() {
         return Atk;
@@ -23,20 +32,20 @@ public class Enemy {
     }
 
     // SETTERS
-    public int setAtk(int x) {
-        return Atk += x;
+    public void setAtk(int x) {
+        this.Atk += x;
     }
-    public int setSpeed(int x) {
-        return Speed += x;
+    public void setSpeed(int x) {
+        this.Speed += x;
     }
-    public int setDef(int x) {
-        return Def += x;
+    public void setDef(int x) {
+        this.Def += x;
     }
-    public int setLife(int x) {
-        return Life += x;
+    public void setLife(int x) {
+        this.Life += x;
     }
-    public int setXP(int x) {
-        return ExpValue += x;
+    public void setXP(int x) {
+        this.ExpValue += x;
     }
 
 }

@@ -1,28 +1,42 @@
 import java.util.Random;
 
-public class Encounter  {
-    private Player player1 = new Player();
-    private Enemy enemy1 = new Enemy();
+public class Encounter {
+    private Enemy enemy;
     private Random ran = new Random();
-    // make atk and def random?
-    public boolean attack() {
-        enemy1.setDef(ran.nextInt(151));
-        // System.out.println(enemy1.getDef());
-    if(player1.getAtk() > enemy1.getDef()) {
-        System.out.println("You Won: 20XP Earned");
-        player1.setXP(20);
-        System.out.println("Player XP: " + player1.getXP());
-        return true;
+    private Item item;
+    
+    public Encounter() {
+        this.enemy = new Enemy(ran.nextInt(100),ran.nextInt(100030));
     }
-    else { 
-        player1.setHealth(-20);
-        System.out.print("Enemy Won");
-        System.out.println("Player Health: " + player1.getHealth());
-        return false;
-    }
-    }
-    public Player getPlayer() {
-        return player1;
+    public boolean rollItem() {
+        // health potion
+        if(ran.nextInt(10) == 1) {
+            this.item = new Item("Health Potion", "Adds +30 Health", 30);
+            return true;
+        }
+        // attack potion
+        else if(ran.nextInt(10) == 2) {
+            this.item = new Item("Attack Potion", "Adds +30 Attack", 30);
+            return true;
+        }
+        // defense potion
+        
+        // else if(ran.nextInt(10) == 3) {
+        //     this.item = new Item("Defense Potion", "Adds +30 Defense", 30);
+        //     return true;
+        // }
+        else {
+            return false;
+        }
     }
 
+    // GET
+    public Enemy getEnemy() {
+        return enemy;
+    }
+    public Item getItem() {
+        return item;
+    }
+
+    
 }

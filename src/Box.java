@@ -1,16 +1,17 @@
 
 public class Box {
     private String data;
-    private String dataHolder;//test
+    private String dataHolder;
     private Box next;
     private Box previous;
-    private Boolean current;
-    private Encounter fight = new Encounter();
+    private Boolean deleted;
+    private Encounter encounter = new Encounter();
 
     public Box(String data) {
         this.data = data;
         this.next = null;
         this.previous = null;
+        this.deleted = false;
     }
     // GETTERS
     public String getData() {
@@ -25,11 +26,11 @@ public class Box {
     public Box getPrevious() {
         return previous;
     }
-    public Boolean getCurrent() {
-        return current;
+    public boolean getDeleted() {
+        return deleted;
     }
-    public Encounter getFight() {
-        return fight;
+    public Encounter getEncounter() {
+        return encounter;
     }
 
     // SETTERS
@@ -45,8 +46,7 @@ public class Box {
     public void setPrevious(Box previous) {
         this.previous = previous;
     }
-    public void setCurrent(Boolean current) {
-        this.current = current;
+    public void setDeleted(Boolean deleted) {
+        this.deleted = deleted;
     }
-    
 }

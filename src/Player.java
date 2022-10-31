@@ -1,14 +1,25 @@
 public class Player {
-    private int HeroLevel = 1;
-    private int Atk = 100;
-    private int Speed = 50;
-    private int Def = 30;
-    private int Health = 100;
-    private int MaxHealth = 150;
-    private int XP = 0;
+    private int HeroLevel;
+    private int Atk;
+    private int Speed;
+    private int Def;
+    private int Health;
+    private int MaxHealth;
+    private int XP;
     // Every 100 xp you level up
     // Level up mechanic updates alls stats by 1
     // player is an encounter
+
+    // default player
+    public Player() {
+        this.HeroLevel = 1;
+        this.Atk = 100;
+        this.Speed = 50;
+        this.Def = 200;
+        this.Health = 200;
+        this.MaxHealth = 150;
+        this.XP = 0;
+    }
 
 
     // GETTERS
@@ -35,26 +46,26 @@ public class Player {
     }
     
     //SETTERS
-    public int setAtk(int x) {
-        return Atk += x;
+    public void setAtk(int x) {
+         this.Atk += x;
     }
-    public int setDef(int x) {
-        return Def += x;
+    public void setDef(int x) {
+         this.Def += x;
     }
-    public int setSpeed(int x) {
-        return Speed += x;
+    public void setSpeed(int x) {
+         this.Speed += x;
     }
-    public int setHealth(int x) {
-        return Health += x;
+    public void setHealth(int x) {
+         this.Health += x;
     }
-    public int setMaxHealth(int x) {
-        return MaxHealth += x;
+    public void setMaxHealth(int x) {
+         this.MaxHealth += x;
     }
-    public int setLevel(int x) {
-        return HeroLevel += x;
+    public void setLevel(int x) {
+         this.HeroLevel += x;
     }
-    public int setXP(int x) {
-        return XP += x;
+    public void setXP(int x) {
+        this.XP += x;
     }
     
 }
